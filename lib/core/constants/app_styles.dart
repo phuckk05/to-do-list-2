@@ -33,4 +33,11 @@ class AppStyles {
     fontWeight: .normal,
     fontSize: 12,
   );
+
+  //style cho label trong phần task
+  static final TextStyle labelTaskStyle = GoogleFonts.inter(
+    color: AppColors.progressColor,
+    fontWeight: .w600,
+    fontSize: 14,
+  );
 }

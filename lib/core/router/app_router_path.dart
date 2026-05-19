@@ -4,6 +4,6 @@ class AppRouterPath {
   static const String stats = '/stats';
   static const String settings = '/settings';
 
+  //chid
   static const String addTask = '/add';
-  static const String editTask = '/edit';
 }

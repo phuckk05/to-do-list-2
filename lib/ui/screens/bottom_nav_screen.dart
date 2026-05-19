@@ -3,27 +3,26 @@ import 'package:go_router/go_router.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'package:to_do_list/core/constants/app_colors.dart';
 
-class BottomNavScreen extends StatefulWidget {
+class BottomNavScreen extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
   const BottomNavScreen({super.key, required this.navigationShell});
+  //mở showbottomsheet
+  void _onTapAddTask(BuildContext context) {
+    context.pushNamed('new_task');
+  }
 
-  @override
-  State<BottomNavScreen> createState() => _BottomNavScreenState();
-}
-
-class _BottomNavScreenState extends State<BottomNavScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: widget.navigationShell,
+      body: navigationShell,
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primaryColor,
-        onPressed: () {},
+        onPressed: () => _onTapAddTask(context),
         child: Icon(Icons.add, color: AppColors.neutralColor),
       ),
       bottomNavigationBar: SalomonBottomBar(
-        currentIndex: widget.navigationShell.currentIndex,
-        onTap: (index) => widget.navigationShell.goBranch(index),
+        currentIndex: navigationShell.currentIndex,
+        onTap: (index) => navigationShell.goBranch(index),
         items: [
           _buildBottomNavItem(
             isWidth: true,

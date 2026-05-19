@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:to_do_list/core/router/app_router_name.dart';
 import 'package:to_do_list/core/router/app_router_path.dart';
 import 'package:to_do_list/ui/screens/bottom_nav_screen.dart';
+import 'package:to_do_list/ui/screens/new_task_screen.dart';
 import 'package:to_do_list/ui/screens/settings_screen.dart';
 import 'package:to_do_list/ui/screens/stats_screen.dart';
 import 'package:to_do_list/ui/screens/tasks_screen.dart';
@@ -14,13 +15,11 @@ GoRouter createRouter(BuildContext context) {
     navigatorKey: rootNavigatorKey,
     initialLocation: AppRouterPath.tasks,
     routes: [
-      // GoRoute(
-      //   name: AppRouterName.root,
-      //   path: AppRouterPath.root,
-      //   builder: (context, state) => Scaffold(
-      //     body: Center(child: Text('Welcome to the To-Do List App!')),
-      //   ),
-      // ),
+      GoRoute(
+        name: AppRouterName.addTask,
+        path: AppRouterPath.addTask,
+        builder: (context, state) => NewTaskScreen(),
+      ),
 
       // App routes sau khi đăng nhập
       StatefulShellRoute.indexedStack(

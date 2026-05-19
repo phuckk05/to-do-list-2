@@ -12,8 +12,9 @@ class Constants {
     'Sat',
   ];
 
-  static List<Map<String, String>> getDaysOfCurrentMonth() {
-    final now = DateTime.now();
+  //lấy danh sách ngày của tháng hiện tại
+  static List<Map<String, String>> getDaysOfCurrentMonth(DateTime? date) {
+    final now = date ?? DateTime.now();
 
     // số ngày trong tháng
     final daysInMonth = DateTime(now.year, now.month + 1, 0).day;
@@ -28,6 +29,12 @@ class Constants {
       result.add({'day': dayName, 'date': dayNumber});
     }
     return result;
+  }
+
+  //lấy ngày tháng năm hiện tại
+  static String getCurrentDate(DateTime? date) {
+    final now = date ?? DateTime.now();
+    return DateFormat('EEEE, M/d/y').format(now);
   }
 
   static int getNumberOfDaysInMonth() {
