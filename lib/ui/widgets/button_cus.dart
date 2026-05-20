@@ -52,16 +52,14 @@ class ButtonCus extends StatelessWidget {
             ),
           ),
           child: isLoading == true
-              ? Expanded(
-                  child: LoadingInternal(
-                    color: AppColors.neutralColor,
-                    loading: isLoading,
-                  ),
+              ? LoadingInternal(
+                  color: AppColors.neutralColor,
+                  loading: isLoading,
                 )
               : Text(
                   text,
                   style: AppStyles.labelTaskStyle.copyWith(
-                    fontWeight: .bold,
+                    fontWeight: FontWeight.bold,
                     color: textColor ?? AppColors.neutralColor,
                   ),
                 ),

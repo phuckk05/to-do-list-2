@@ -4,6 +4,16 @@ class DatetimeNowCubit extends Cubit<DateTime> {
   DatetimeNowCubit() : super(DateTime.now());
 
   void updateDate(DateTime newDate) {
-    emit(newDate);
+    print('emit date = $newDate');
+    emit(
+      DateTime(
+        newDate.year,
+        newDate.month,
+        newDate.day,
+        DateTime.now().hour,
+        DateTime.now().minute,
+        DateTime.now().second,
+      ),
+    );
   }
 }

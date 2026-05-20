@@ -21,7 +21,7 @@ class CheckboxCus extends StatelessWidget {
                     width: 22,
                     height: 22,
                     decoration: BoxDecoration(
-                      shape: .circle,
+                      shape: BoxShape.circle,
                       border: Border.all(color: AppColors.greyColor, width: 1),
                     ),
                   ),

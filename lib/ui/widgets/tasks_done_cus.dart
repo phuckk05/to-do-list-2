@@ -18,9 +18,9 @@ class TasksDoneCus extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
-          mainAxisSize: .max,
-          mainAxisAlignment: .center,
-          crossAxisAlignment: .start,
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'YOUR PROGRESS',

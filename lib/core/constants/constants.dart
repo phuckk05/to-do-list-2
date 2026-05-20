@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class Constants {
@@ -39,5 +40,14 @@ class Constants {
 
   static int getNumberOfDaysInMonth() {
     return DateTime(DateTime.now().year, DateTime.now().month + 1, 0).day;
+  }
+
+  static TimeOfDay parseTimeOfDay(String timeString) {
+    final parts = timeString.split(':');
+    return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+  }
+
+  bool isSameDate(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 }

@@ -4,10 +4,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:to_do_list/core/constants/app_colors.dart';
 import 'package:to_do_list/core/constants/app_styles.dart';
 import 'package:to_do_list/ui/cubits/checkbox_cubit.dart';
+import 'package:to_do_list/ui/models/task.dart';
 import 'package:to_do_list/ui/widgets/checkbox_cus.dart';
 
 class ItemListTaskCus extends StatelessWidget {
-  const ItemListTaskCus({super.key});
+  final Task task;
+  const ItemListTaskCus({super.key, required this.task});
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +55,7 @@ class ItemListTaskCus extends StatelessWidget {
   //text time
   Widget _buildTime(bool isChecked) {
     return Text(
-      '08:00 - 10:00',
+      task.startTime + ' - ' + task.endTime,
       style: GoogleFonts.inter(
         color: isChecked
             ? AppColors.greyColor.withOpacity(0.5)
@@ -68,7 +70,7 @@ class ItemListTaskCus extends StatelessWidget {
   //text task title
   Widget _buildTaskTitle(bool isChecked) {
     return Text(
-      'Task Titlesajfffffffffffffffffffffffffffffffffffffffffffffh',
+      task.title,
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
       style: AppStyles.progressTaskStyle.copyWith(

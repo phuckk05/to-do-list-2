@@ -1,9 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class SelectDayCubit extends Cubit<int> {
-  SelectDayCubit() : super(DateTime.now().day);
+class SelectDayCubit extends Cubit<DateTime> {
+  SelectDayCubit() : super(DateTime.now());
 
-  void selectDay(int day) {
-    emit(day);
+  void selectDay(DateTime date) {
+    emit(DateTime(date.year, date.month, date.day));
   }
 }

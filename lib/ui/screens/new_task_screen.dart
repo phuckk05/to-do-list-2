@@ -3,25 +3,53 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:to_do_list/core/constants/app_colors.dart';
 import 'package:to_do_list/core/constants/app_styles.dart';
 import 'package:to_do_list/core/constants/constants.dart';
-import 'package:to_do_list/ui/cubits/loading_global_cubit.dart';
+import 'package:to_do_list/ui/blocs/task/task_bloc.dart';
+import 'package:to_do_list/ui/blocs/task/task_event.dart';
+import 'package:to_do_list/ui/blocs/task/task_state.dart';
 import 'package:to_do_list/ui/cubits/loading_internal_cubit.dart';
+import 'package:to_do_list/ui/models/task.dart';
 import 'package:to_do_list/ui/widgets/button_cus.dart';
 import 'package:to_do_list/ui/widgets/label_cus.dart';
-import 'package:to_do_list/ui/widgets/loading_internal.dart';
 import 'package:to_do_list/ui/widgets/text_field_cus.dart';
 
-class NewTaskScreen extends StatelessWidget {
-  NewTaskScreen({super.key});
+class NewTaskScreen extends StatefulWidget {
+  const NewTaskScreen({super.key});
 
+  @override
+  State<NewTaskScreen> createState() => _NewTaskScreenState();
+}
+
+class _NewTaskScreenState extends State<NewTaskScreen> {
+  late TaskBloc _taskBloc;
   final TextEditingController _taskTitleController = TextEditingController();
+
   final TextEditingController _taskDateController = TextEditingController(
     text: Constants.getCurrentDate(DateTime.now()),
   );
+
   final TextEditingController _taskStartTimeController =
       TextEditingController();
+
   final TextEditingController _taskEndTimeController = TextEditingController();
+
   final TextEditingController _taskDescriptionController =
       TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _taskBloc = context.read<TaskBloc>();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _taskTitleController.dispose();
+    _taskDateController.dispose();
+    _taskStartTimeController.dispose();
+    _taskEndTimeController.dispose();
+    _taskDescriptionController.dispose();
+  }
 
   void _onbackPressed(BuildContext context) {
     Navigator.of(context).pop();
@@ -56,9 +84,17 @@ class NewTaskScreen extends StatelessWidget {
 
   //oncreate
   void _onCreateTaskPressed(BuildContext context) async {
-    context.read<LoadingInternalCubit>().setLoading(true);
-    await Future.delayed(Duration(seconds: 10));
-    context.read<LoadingInternalCubit>().setLoading(false);
+    final task = Task(
+      id: DateTime.now().millisecondsSinceEpoch,
+      title: _taskTitleController.text,
+      date: _taskDateController.text,
+      startTime: _taskStartTimeController.text,
+      endTime: _taskEndTimeController.text,
+      description: _taskDescriptionController.text,
+      status: TaskStatus.pending,
+    );
+
+    _taskBloc.add(CreateTask(task));
   }
 
   @override
@@ -75,11 +111,12 @@ class NewTaskScreen extends StatelessWidget {
               snap: true,
               elevation: 0,
               title: Column(
-                mainAxisAlignment: .center,
-                crossAxisAlignment: .start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'New Task',
+
                     style: AppStyles.timeTaskStyle.copyWith(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -201,8 +238,8 @@ class NewTaskScreen extends StatelessWidget {
                 ),
               ),
             ),
-            BlocBuilder<LoadingInternalCubit, bool>(
-              builder: (context, isLoading) {
+            BlocBuilder<TaskBloc, TaskState>(
+              builder: (context, state) {
                 return SliverPadding(
                   padding: EdgeInsets.only(left: 16, top: 12, right: 12),
                   sliver: SliverToBoxAdapter(
@@ -210,7 +247,7 @@ class NewTaskScreen extends StatelessWidget {
                       onPressed: () {
                         _onCreateTaskPressed(context);
                       },
-                      isLoading: isLoading,
+                      isLoading: state.status == StateStatus.loading,
                       text: 'Create Task',
                       width: double.infinity,
                       height: 50,

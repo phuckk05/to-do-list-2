@@ -5,11 +5,15 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:to_do_list/core/constants/app_colors.dart';
 import 'package:to_do_list/core/constants/app_styles.dart';
 import 'package:to_do_list/core/constants/constants.dart';
+import 'package:to_do_list/ui/blocs/task/task_state.dart';
 import 'package:to_do_list/ui/cubits/datetime_now_cubit.dart';
 import 'package:to_do_list/ui/cubits/select_day_cubit.dart';
 import 'package:to_do_list/ui/widgets/day_cus.dart';
 import 'package:to_do_list/ui/widgets/item_list_task_cus.dart';
 import 'package:to_do_list/ui/widgets/tasks_done_cus.dart';
+
+import '../blocs/task/task_bloc.dart';
+import '../blocs/task/task_event.dart';
 
 class TasksScreen extends StatefulWidget {
   const TasksScreen({super.key});
@@ -25,6 +29,8 @@ class _TasksScreenState extends State<TasksScreen> {
 
   @override
   void initState() {
+    //lấy tất cả tasks
+    context.read<TaskBloc>().add(LoadAllTasks());
     context.read<DatetimeNowCubit>().updateDate(DateTime.now());
     WidgetsBinding.instance.addPostFrameCallback((_) {
       itemScrollController.scrollTo(
@@ -44,7 +50,9 @@ class _TasksScreenState extends State<TasksScreen> {
       duration: const Duration(seconds: 1),
       curve: Curves.easeInOut,
     );
-    context.read<SelectDayCubit>().selectDay(index + 1);
+    context.read<SelectDayCubit>().selectDay(
+      DateTime.now().copyWith(day: index + 1),
+    );
   }
 
   void _onTapChangeDate() async {
@@ -59,12 +67,17 @@ class _TasksScreenState extends State<TasksScreen> {
       //nếu cùng tháng
       if (DateTime.now().month != picked.month ||
           DateTime.now().year != picked.year) {
-        context.read<SelectDayCubit>().selectDay(0);
-        _onTapChangeDay(context.read<SelectDayCubit>().state);
+        print('Selected month: ${picked.month}, year: ${picked.year}');
+        context.read<SelectDayCubit>().selectDay(
+          DateTime(picked.year, picked.month, 1),
+        );
+        _onTapChangeDay(context.read<SelectDayCubit>().state.day - 1);
       } else {
         _onTapChangeDay(DateTime.now().day - 1);
+        context.read<SelectDayCubit>().selectDay(
+          DateTime(picked.year, picked.month, DateTime.now().day),
+        );
       }
-      context.read<DatetimeNowCubit>().updateDate(picked);
     }
   }
 
@@ -86,8 +99,8 @@ class _TasksScreenState extends State<TasksScreen> {
             snap: true,
             elevation: 0,
             title: Column(
-              mainAxisAlignment: .center,
-              crossAxisAlignment: .start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'To Day',
@@ -148,15 +161,33 @@ class _TasksScreenState extends State<TasksScreen> {
           //danh sách task đã hoàn thành
           SliverToBoxAdapter(child: TasksDoneCus()),
           //danh sách task
-          SliverPadding(
-            padding: const EdgeInsets.only(top: 12),
-            sliver: SliverList.separated(
-              itemCount: 10,
-              itemBuilder: (context, index) {
-                return ItemListTaskCus();
-              },
-              separatorBuilder: (context, index) => SizedBox(height: 16),
-            ),
+          BlocBuilder<TaskBloc, TaskState>(
+            builder: (context, state) {
+              return BlocBuilder<SelectDayCubit, DateTime>(
+                builder: (context, selectedDate) {
+                  final tasksOfSelectedDay =
+                      state.task?.where((task) {
+                        return task.date ==
+                            Constants.getCurrentDate(selectedDate);
+                      }).toList() ??
+                      [];
+
+                  // print('Tasks of selected day: ${state.task!.first.date}');
+                  print('Selected date: ${selectedDate}');
+                  return SliverPadding(
+                    padding: const EdgeInsets.only(top: 12),
+                    sliver: SliverList.separated(
+                      itemCount: tasksOfSelectedDay.length,
+                      itemBuilder: (context, index) {
+                        return ItemListTaskCus(task: tasksOfSelectedDay[index]);
+                      },
+                      separatorBuilder: (context, index) =>
+                          SizedBox(height: 16),
+                    ),
+                  );
+                },
+              );
+            },
           ),
         ],
       ),

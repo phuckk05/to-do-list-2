@@ -12,7 +12,7 @@ class DayCus extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<SelectDayCubit, int>(
+    return BlocBuilder<SelectDayCubit, DateTime>(
       builder: (context, selectedDay) {
         return Padding(
           padding: const EdgeInsets.only(
@@ -28,7 +28,7 @@ class DayCus extends StatelessWidget {
               width: 60,
               height: 80,
               decoration: BoxDecoration(
-                color: selectedDay == date
+                color: selectedDay.day == DateTime.now().copyWith(day: date).day
                     ? AppColors.primaryColor
                     : AppColors.neutralColor,
                 borderRadius: BorderRadius.circular(20),
@@ -47,7 +47,9 @@ class DayCus extends StatelessWidget {
                   Text(
                     day,
                     style: AppStyles.dayOfWeekStyle.copyWith(
-                      color: selectedDay == date
+                      color:
+                          selectedDay.day ==
+                              DateTime.now().copyWith(day: date).day
                           ? AppColors.neutralColor
                           : AppColors.progressColor,
                     ),
@@ -55,7 +57,9 @@ class DayCus extends StatelessWidget {
                   Text(
                     date.toString(),
                     style: AppStyles.dateOfWeekStyle.copyWith(
-                      color: selectedDay == date
+                      color:
+                          selectedDay.day ==
+                              DateTime.now().copyWith(day: date).day
                           ? AppColors.neutralColor
                           : AppColors.progressColor,
                     ),

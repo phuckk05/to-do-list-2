@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:month_year_picker/month_year_picker.dart';
 import 'package:to_do_list/core/router/app_router.dart';
+import 'package:to_do_list/ui/blocs/task/task_bloc.dart';
 import 'package:to_do_list/ui/cubits/checkbox_cubit.dart';
+import 'package:to_do_list/ui/cubits/database_cubit.dart';
 import 'package:to_do_list/ui/cubits/datetime_now_cubit.dart';
 import 'package:to_do_list/ui/cubits/loading_global_cubit.dart';
 import 'package:to_do_list/ui/cubits/loading_internal_cubit.dart';
@@ -19,6 +21,8 @@ void main() {
         BlocProvider(create: (_) => DatetimeNowCubit()),
         BlocProvider(create: (_) => LoadingGlobalCubit()),
         BlocProvider(create: (_) => LoadingInternalCubit()),
+        BlocProvider(create: (_) => DatabaseCubit()),
+        BlocProvider(create: (_) => TaskBloc()),
       ],
       child: const ToDoList(),
     ),
@@ -36,6 +40,7 @@ class _ToDoListState extends State<ToDoList> {
 
   @override
   void initState() {
+    context.read<DatabaseCubit>().initializeDatabase();
     _router = createRouter(context);
     super.initState();
   }
