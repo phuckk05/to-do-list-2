@@ -1,6 +1,6 @@
 # 📝 To-Do List App
 
-Ứng dụng quản lý công việc (To-Do List) được xây dựng bằng Flutter với kiến trúc BLoC/Cubit, hỗ trợ đa ngôn ngữ (Tiếng Việt và Tiếng Anh).
+Ứng dụng quản lý công việc (To-Do List) được xây dựng bằng Flutter với kiến trúc BLoC/Cubit
 
 ## ✨ Tính năng
 
