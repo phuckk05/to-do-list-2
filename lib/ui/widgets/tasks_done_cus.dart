@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:to_do_list/core/constants/app_colors.dart';
 import 'package:to_do_list/core/constants/app_styles.dart';
 
+import '../models/task.dart';
+
 class TasksDoneCus extends StatelessWidget {
-  const TasksDoneCus({super.key});
+  final List<Task> tasks;
+  const TasksDoneCus({super.key, required this.tasks});
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +32,7 @@ class TasksDoneCus extends StatelessWidget {
             ),
             //số task đã hoàn thành
             Text(
-              '1 of 3 Tasks Done',
+              '${tasks.where((task) => task.status == TaskStatus.completed).length} of ${tasks.length} Tasks Done',
               textAlign: TextAlign.center,
               style: AppStyles.progressTaskStyle,
             ),
@@ -45,7 +48,14 @@ class TasksDoneCus extends StatelessWidget {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: FractionallySizedBox(
-                  widthFactor: 1 / 3,
+                  widthFactor: tasks.isNotEmpty
+                      ? tasks
+                                .where(
+                                  (task) => task.status == TaskStatus.completed,
+                                )
+                                .length /
+                            tasks.length
+                      : 0,
                   child: Container(
                     decoration: BoxDecoration(
                       color: AppColors.neutralColor,

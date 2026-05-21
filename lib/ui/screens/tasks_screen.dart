@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:month_year_picker/month_year_picker.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:to_do_list/core/constants/app_colors.dart';
 import 'package:to_do_list/core/constants/app_styles.dart';
 import 'package:to_do_list/core/constants/constants.dart';
+import 'package:to_do_list/core/router/app_router_name.dart';
 import 'package:to_do_list/ui/blocs/task/task_state.dart';
 import 'package:to_do_list/ui/cubits/datetime_now_cubit.dart';
 import 'package:to_do_list/ui/cubits/select_day_cubit.dart';
+import 'package:to_do_list/ui/models/task.dart';
 import 'package:to_do_list/ui/widgets/day_cus.dart';
 import 'package:to_do_list/ui/widgets/item_list_task_cus.dart';
+import 'package:to_do_list/ui/widgets/loading_internal.dart';
 import 'package:to_do_list/ui/widgets/tasks_done_cus.dart';
 
 import '../blocs/task/task_bloc.dart';
@@ -43,16 +47,14 @@ class _TasksScreenState extends State<TasksScreen> {
     super.initState();
   }
 
-  void _onTapChangeDay(int index) {
+  void _onTapChangeDay(int index, DateTime date) {
     itemScrollController.scrollTo(
       index: index,
       alignment: 0.4,
       duration: const Duration(seconds: 1),
       curve: Curves.easeInOut,
     );
-    context.read<SelectDayCubit>().selectDay(
-      DateTime.now().copyWith(day: index + 1),
-    );
+    context.read<SelectDayCubit>().selectDay(date);
   }
 
   void _onTapChangeDate() async {
@@ -64,21 +66,33 @@ class _TasksScreenState extends State<TasksScreen> {
       lastDate: DateTime(2100),
     );
     if (picked != null) {
+      context.read<DatetimeNowCubit>().updateDate(picked);
       //nếu cùng tháng
       if (DateTime.now().month != picked.month ||
           DateTime.now().year != picked.year) {
         print('Selected month: ${picked.month}, year: ${picked.year}');
-        context.read<SelectDayCubit>().selectDay(
-          DateTime(picked.year, picked.month, 1),
-        );
-        _onTapChangeDay(context.read<SelectDayCubit>().state.day - 1);
+        // context.read<SelectDayCubit>().selectDay(
+        //   DateTime(picked.year, picked.month, 1, 0, 0, 0),
+        // );
+        _onTapChangeDay(0, DateTime(picked.year, picked.month, 1, 0, 0, 0));
       } else {
-        _onTapChangeDay(DateTime.now().day - 1);
-        context.read<SelectDayCubit>().selectDay(
-          DateTime(picked.year, picked.month, DateTime.now().day),
+        _onTapChangeDay(
+          DateTime.now().day - 1,
+          DateTime(picked.year, picked.month, DateTime.now().day, 0, 0, 0),
         );
+        // context.read<SelectDayCubit>().selectDay(
+        //   DateTime(picked.year, picked.month, DateTime.now().day, 0, 0, 0),
+        // );
       }
     }
+  }
+
+  void _onEditTask(Task task) {
+    context.pushNamed(AppRouterName.editTask, extra: task);
+  }
+
+  void _onTapAddTask(BuildContext context) {
+    this.context.pushNamed(AppRouterName.addTask);
   }
 
   @override
@@ -94,6 +108,7 @@ class _TasksScreenState extends State<TasksScreen> {
         physics: BouncingScrollPhysics(),
         slivers: [
           SliverAppBar(
+            backgroundColor: AppColors.neutralColor,
             expandedHeight: 56,
             floating: true,
             snap: true,
@@ -127,7 +142,7 @@ class _TasksScreenState extends State<TasksScreen> {
           BlocBuilder<DatetimeNowCubit, DateTime>(
             builder: (context, selecedDate) {
               return SliverPadding(
-                padding: const EdgeInsets.only(top: 12),
+                padding: const EdgeInsets.only(top: 0),
                 sliver: SliverToBoxAdapter(
                   child: SizedBox(
                     height: 102,
@@ -146,7 +161,17 @@ class _TasksScreenState extends State<TasksScreen> {
                         return DayCus(
                           day: day ?? '',
                           date: int.tryParse(date ?? '0') ?? 0,
-                          onTap: () => _onTapChangeDay(index),
+                          onTap: () => _onTapChangeDay(
+                            index,
+                            DateTime(
+                              selecedDate.year,
+                              selecedDate.month,
+                              int.tryParse(date ?? '0') ?? 0,
+                              0,
+                              0,
+                              0,
+                            ),
+                          ),
                         );
                       },
                       itemCount: Constants.getDaysOfCurrentMonth(
@@ -159,7 +184,6 @@ class _TasksScreenState extends State<TasksScreen> {
             },
           ),
           //danh sách task đã hoàn thành
-          SliverToBoxAdapter(child: TasksDoneCus()),
           //danh sách task
           BlocBuilder<TaskBloc, TaskState>(
             builder: (context, state) {
@@ -167,29 +191,74 @@ class _TasksScreenState extends State<TasksScreen> {
                 builder: (context, selectedDate) {
                   final tasksOfSelectedDay =
                       state.task?.where((task) {
-                        return task.date ==
-                            Constants.getCurrentDate(selectedDate);
-                      }).toList() ??
-                      [];
+                              return task.date ==
+                                  Constants.getCurrentDate(selectedDate);
+                            }).toList() ??
+                            []
+                        ..sort((a, b) => a.startTime.compareTo(b.startTime));
 
-                  // print('Tasks of selected day: ${state.task!.first.date}');
-                  print('Selected date: ${selectedDate}');
-                  return SliverPadding(
-                    padding: const EdgeInsets.only(top: 12),
-                    sliver: SliverList.separated(
-                      itemCount: tasksOfSelectedDay.length,
-                      itemBuilder: (context, index) {
-                        return ItemListTaskCus(task: tasksOfSelectedDay[index]);
-                      },
-                      separatorBuilder: (context, index) =>
-                          SizedBox(height: 16),
-                    ),
+                  if (state.status == StateStatus.loading &&
+                      state.action == StateAction.getting) {
+                    return SliverToBoxAdapter(
+                      child: SizedBox(
+                        height: 50,
+                        child: LoadingInternal(
+                          color: AppColors.progressColor,
+                          loading: true,
+                        ),
+                      ),
+                    );
+                  }
+
+                  return SliverMainAxisGroup(
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: TasksDoneCus(tasks: tasksOfSelectedDay),
+                      ),
+
+                      if (tasksOfSelectedDay.isNotEmpty) ...[
+                        SliverPadding(
+                          padding: const EdgeInsets.only(top: 12),
+                          sliver: SliverList.separated(
+                            itemCount: tasksOfSelectedDay.length,
+                            itemBuilder: (context, index) {
+                              return ItemListTaskCus(
+                                task: tasksOfSelectedDay[index],
+                                onTap: () =>
+                                    _onEditTask(tasksOfSelectedDay[index]),
+                              );
+                            },
+                            separatorBuilder: (context, index) =>
+                                SizedBox(height: 16),
+                          ),
+                        ),
+                      ] else ...[
+                        SliverPadding(
+                          padding: const EdgeInsets.only(top: 32),
+                          sliver: SliverToBoxAdapter(
+                            child: Text(
+                              'No tasks for this day',
+                              style: AppStyles.labelTaskStyle.copyWith(
+                                fontSize: 14,
+                                color: AppColors.greyColor,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
                   );
                 },
               );
             },
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColors.primaryColor,
+        onPressed: () => _onTapAddTask(context),
+        child: Icon(Icons.add, color: AppColors.neutralColor),
       ),
     );
   }

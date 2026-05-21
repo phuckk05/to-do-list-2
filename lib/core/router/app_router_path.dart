@@ -6,4 +6,5 @@ class AppRouterPath {
 
   //chid
   static const String addTask = '/add';
+  static const String editTask = '/edit';
 }

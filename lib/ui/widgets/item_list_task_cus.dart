@@ -9,7 +9,8 @@ import 'package:to_do_list/ui/widgets/checkbox_cus.dart';
 
 class ItemListTaskCus extends StatelessWidget {
   final Task task;
-  const ItemListTaskCus({super.key, required this.task});
+  final VoidCallback? onTap;
+  const ItemListTaskCus({super.key, required this.task, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -20,33 +21,33 @@ class ItemListTaskCus extends StatelessWidget {
         color: AppColors.primaryColor,
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Container(
-        margin: EdgeInsets.only(left: 6),
-        decoration: BoxDecoration(
-          color: AppColors.neutralColor,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.primaryColor, width: 1),
-        ),
-        child: Row(
-          children: [
-            SizedBox(width: 12),
-            CheckboxCus(),
-            SizedBox(width: 12),
-            Expanded(
-              child: BlocBuilder<CheckboxCubit, bool>(
-                builder: (context, isChecked) {
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildTime(isChecked),
-                      _buildTaskTitle(isChecked),
-                    ],
-                  );
-                },
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          margin: EdgeInsets.only(left: 6),
+          decoration: BoxDecoration(
+            color: AppColors.neutralColor,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: AppColors.primaryColor, width: 1),
+          ),
+          child: Row(
+            children: [
+              SizedBox(width: 12),
+              CheckboxCus(checked: task.status == TaskStatus.completed),
+              SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildTime(task.status == TaskStatus.completed),
+                    _buildTaskTitle(task.status == TaskStatus.completed),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

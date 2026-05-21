@@ -6,4 +6,5 @@ class AppRouterName {
 
   //chid
   static const String addTask = 'new_task';
+  static const String editTask = 'edit_task';
 }

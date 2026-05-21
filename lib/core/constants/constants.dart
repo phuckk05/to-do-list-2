@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:to_do_list/core/constants/app_colors.dart';
+import 'package:to_do_list/core/constants/app_styles.dart';
 
 class Constants {
   //danh sách thứ viết tắt trong tuần
@@ -49,5 +51,31 @@ class Constants {
 
   bool isSameDate(DateTime a, DateTime b) {
     return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
+
+  //message khi tạo task thành công
+  static ScaffoldMessengerState showSuccessMessage({
+    required BuildContext context,
+    required String message,
+    Color? color,
+    Color? backgroundColor,
+  }) {
+    return ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          content: Center(
+            child: Text(
+              message,
+              style: AppStyles.labelTaskStyle.copyWith(
+                color: color ?? AppColors.neutralColor,
+              ),
+            ),
+          ),
+          backgroundColor: backgroundColor ?? AppColors.primaryColor,
+        ),
+      );
   }
 }

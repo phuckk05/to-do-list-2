@@ -12,6 +12,18 @@ class CreateTask extends TaskEvent {
   CreateTask(this.task);
 }
 
+//update task
+class UpdateTask extends TaskEvent {
+  final Task task;
+  UpdateTask(this.task);
+}
+
+//dalete task
+class DeleteTask extends TaskEvent {
+  final Task task;
+  DeleteTask(this.task);
+}
+
 //Lấy danh sách task theo ngày
 class LoadTasksByDate extends TaskEvent {
   final String date;

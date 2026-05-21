@@ -11,7 +11,13 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
   TaskBloc() : super(TaskState()) {
     on<LoadAllTasks>((event, emit) async {
       //xử lý logic lấy tất cả task
-      emit(state.copyWith(status: StateStatus.loading));
+      emit(
+        state.copyWith(
+          action: StateAction.getting,
+          status: StateStatus.loading,
+        ),
+      );
+      // await Future.delayed(const Duration(seconds: 2));
       await emit.forEach<List<Task>>(
         taskRepository.getAll(),
         onData: (tasks) {
@@ -28,11 +34,53 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     on<CreateTask>((event, emit) async {
       //tạo loading
       try {
-        emit(state.copyWith(status: StateStatus.loading));
+        emit(
+          state.copyWith(
+            action: StateAction.creating,
+            status: StateStatus.loading,
+          ),
+        );
+
+        await Future.delayed(const Duration(seconds: 2));
+
+        await taskRepository.createTask(event.task);
+        emit(state.copyWith(status: StateStatus.success));
+      } catch (e) {
+        if (emit.isDone) return;
+        emit(state.copyWith(status: StateStatus.failure));
+      }
+    });
+    on<DeleteTask>((event, emit) async {
+      try {
+        emit(
+          state.copyWith(
+            action: StateAction.deleting,
+            status: StateStatus.loading,
+          ),
+        );
+
+        await Future.delayed(const Duration(seconds: 2));
+
+        await taskRepository.delateTask(event.task);
+        emit(state.copyWith(status: StateStatus.success));
+      } catch (e) {
+        if (emit.isDone) return;
+        emit(state.copyWith(status: StateStatus.failure));
+      }
+    });
+    //update task
+    on<UpdateTask>((event, emit) async {
+      try {
+        emit(
+          state.copyWith(
+            action: StateAction.updating,
+            status: StateStatus.loading,
+          ),
+        );
 
         await Future.delayed(const Duration(seconds: 5));
 
-        await taskRepository.createTask(event.task);
+        await taskRepository.updateTask(event.task);
         emit(state.copyWith(status: StateStatus.success));
       } catch (e) {
         if (emit.isDone) return;

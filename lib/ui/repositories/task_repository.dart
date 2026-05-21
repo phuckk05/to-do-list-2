@@ -18,8 +18,10 @@ class TaskRepository {
 
   //get task theo date
   //   Future<List<Task>> getAllByDate(String date) => taskDao.getAllTasks(date);
-  //dalete
-  //   Future<void> delateTask(Task task) => taskDao.deleteTask(task);
-  //update
-  //   Future<void> updateTask(Task task) => taskDao.updateTask(task);
+  // dalete
+  Future<void> delateTask(Task task) =>
+      _database.then((value) => value.taskDao.deleteTask(task));
+  // update
+  Future<void> updateTask(Task task) =>
+      _database.then((value) => value.taskDao.updateTask(task));
 }
