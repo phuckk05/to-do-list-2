@@ -148,14 +148,3 @@ Mọi đóng góp đều được hoan nghênh! Vui lòng:
 4. Push to branch (`git push origin feature/AmazingFeature`)
 5. Mở Pull Request
 
-## 📄 License
-
-Dự án này được phân phối dưới giấy phép MIT. Xem file `LICENSE` để biết thêm chi tiết.
-
-## 📧 Liên hệ
-
-Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ qua email hoặc tạo issue trên GitHub.
-
----
-
-**Made with ❤️ using Flutter**
